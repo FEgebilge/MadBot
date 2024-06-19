@@ -74,22 +74,12 @@ async def who_is_right(interaction: discord.Interaction, timeout: int):
 async def send_image(interaction:discord.Interaction):
     await slash_commands.send_image(interaction=interaction)
 
-@bot.tree.command(name="meme_ege")
+"""
+@bot.tree.command(name="meme_name")
 @app_commands.describe(text="the text you want to put on the meme")
 async def meme_ege(interaction:discord.Interaction,text:str):
-    await slash_commands.meme_generator(interaction=interaction,text=text,y_position=20,name="ege")
-
-
-@bot.tree.command(name="meme_isil")
-@app_commands.describe(text="the text you want to put on the meme")
-async def meme_isil(interaction:discord.Interaction,text:str):
-    await slash_commands.meme_generator(interaction=interaction,text=text,y_position=700,name="isil")
-
-
-@bot.tree.command(name="meme_ozge")
-@app_commands.describe(text="the text you want to put on the meme")
-async def meme_ozge(interaction:discord.Interaction,text:str):
-    await slash_commands.meme_generator(interaction=interaction,text=text,y_position=1200,name="ozge")
+    await slash_commands.meme_generator(interaction=interaction,text=text,y_position=20,name="name")
+"""
 
 host_site="www.google.com"
 @bot.tree.command(name="ping")
