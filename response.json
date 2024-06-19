@@ -1,0 +1,45 @@
+{
+    "location": {
+        "name": "Izmir",
+        "region": "Izmir",
+        "country": "Turkey",
+        "lat": 38.41,
+        "lon": 27.14,
+        "tz_id": "Europe/Istanbul",
+        "localtime_epoch": 1688380877,
+        "localtime": "2023-07-03 13:41"
+    },
+    "current": {
+        "last_updated_epoch": 1688380200,
+        "last_updated": "2023-07-03 13:30",
+        "temp_c": 31.0,
+        "temp_f": 87.8,
+        "is_day": 1,
+        "condition": {
+            "text": "Partly cloudy",
+            "icon": "//cdn.weatherapi.com/weather/64x64/day/116.png",
+            "code": 1003
+        },
+        "wind_mph": 11.9,
+        "wind_kph": 19.1,
+        "wind_degree": 250,
+        "wind_dir": "WSW",
+        "pressure_mb": 1009.0,
+        "pressure_in": 29.8,
+        "precip_mm": 0.0,
+        "precip_in": 0.0,
+        "humidity": 49,
+        "cloud": 25,
+        "feelslike_c": 30.0,
+        "feelslike_f": 86.0,
+        "vis_km": 10.0,
+        "vis_miles": 6.0,
+        "uv": 9.0,
+        "gust_mph": 9.6,
+        "gust_kph": 15.5
+    }
+}
+
+
+
+

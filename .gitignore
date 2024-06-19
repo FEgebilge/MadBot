@@ -1,0 +1,16 @@
+
+.DS_Store
+config.json
+__pycache__/bot.cpython-312.pyc
+.vscode/settings.json
+__pycache__/youtube_player.cpython-311.pyc
+__pycache__/weather_api.cpython-311.pyc
+__pycache__/weather.cpython-311.pyc
+__pycache__/slash_commands.cpython-311.pyc
+__pycache__/responses.cpython-311.pyc
+__pycache__/movie_api.cpython-311.pyc
+__pycache__/lists.cpython-311.pyc
+__pycache__/imagelink.cpython-311.pyc
+__pycache__/gpt_api.cpython-311.pyc
+__pycache__/config.cpython-311.pyc
+__pycache__/bot.cpython-311.pyc

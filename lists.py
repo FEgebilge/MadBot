@@ -1,0 +1,1 @@
+hello_list = ["Hi,","Hello,","Welcome,","Hi!","It's good to see you","Hey, long time no see you"]
