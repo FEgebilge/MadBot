@@ -195,6 +195,7 @@ async def meme_generator(interaction: discord.Interaction, text: str,y_position:
 
     await interaction.response.send_message(file=image_file)
 
+
 async def add_record_prompt(interaction: discord.Interaction, bot: discord.Client):
     await interaction.followup.send("Enter the name of the series/movie (or type 0 to cancel):", ephemeral=True)
     msg = await bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
@@ -306,7 +307,7 @@ async def view_watchlist(interaction: discord.Interaction, bot: discord.Client):
     user_id = str(interaction.user.id)
     data = watch_tracker.load_data(user_id)
     if not data:
-        await interaction.response.send_message("No records found.", ephemeral=True)
+        await interaction.followup.send("No records found.", ephemeral=True)
         return
 
     embed = discord.Embed(
@@ -316,7 +317,7 @@ async def view_watchlist(interaction: discord.Interaction, bot: discord.Client):
     )
     records = [f"{index + 1}. {name}: {position}" for index, (name, position) in enumerate(data.items())]
     embed.add_field(name="Your records", value="\n".join(records), inline=False)
-    await interaction.response.send_message(embed=embed, ephemeral=True)
+    await interaction.followup.send(embed=embed, ephemeral=True)
     
     def check(msg):
         return msg.author == interaction.user and msg.channel == interaction.channel
