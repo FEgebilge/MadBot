@@ -195,7 +195,6 @@ async def meme_generator(interaction: discord.Interaction, text: str,y_position:
 
     await interaction.response.send_message(file=image_file)
 
-
 async def add_record_prompt(interaction: discord.Interaction, bot: discord.Client):
     await interaction.followup.send("Enter the name of the series/movie (or type 0 to cancel):", ephemeral=True)
     msg = await bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
@@ -303,7 +302,7 @@ async def remove_record_prompt(interaction: discord.Interaction, bot: discord.Cl
     except asyncio.TimeoutError:
         await interaction.followup.send("Action timed out. Please start again.", ephemeral=True)
 
-async def list_records(interaction: discord.Interaction):
+async def view_watchlist(interaction: discord.Interaction, bot: discord.Client):
     user_id = str(interaction.user.id)
     data = watch_tracker.load_data(user_id)
     if not data:
@@ -311,9 +310,36 @@ async def list_records(interaction: discord.Interaction):
         return
 
     embed = discord.Embed(
-        title="Your Records",
+        title="Your Watchlist",
+        description="Type the name of the show/movie to search or type 0 to cancel:",
         color=discord.Color.purple()
     )
     records = [f"{index + 1}. {name}: {position}" for index, (name, position) in enumerate(data.items())]
-    embed.add_field(name="Records", value="\n".join(records), inline=False)
+    embed.add_field(name="Your records", value="\n".join(records), inline=False)
     await interaction.response.send_message(embed=embed, ephemeral=True)
+    
+    def check(msg):
+        return msg.author == interaction.user and msg.channel == interaction.channel
+    
+    try:
+        msg = await bot.wait_for('message', check=check, timeout=60)
+        await msg.delete()
+        
+        if msg.content == "0":
+            await interaction.followup.send("Action cancelled.", ephemeral=True)
+            return
+        
+        search_query = msg.content.lower()
+        search_results = [f"{name}: {position}" for name, position in data.items() if search_query in name.lower()]
+        
+        if search_results:
+            embed = discord.Embed(
+                title="Search Results",
+                description="\n".join(search_results),
+                color=discord.Color.green()
+            )
+            await interaction.followup.send(embed=embed, ephemeral=True)
+        else:
+            await interaction.followup.send("No matching records found.", ephemeral=True)
+    except asyncio.TimeoutError:
+        await interaction.followup.send("Action timed out. Please start again.", ephemeral=True)

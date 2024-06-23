@@ -100,7 +100,7 @@ async def watch_tracker(interaction: discord.Interaction):
     interaction_states[user_id] = 'ongoing'  # Set state to ongoing
     embed = discord.Embed(
         title="Watch Tracker",
-        description="Select an action by typing the corresponding number:\n1. Add a new entry\n2. Update an existing entry\n3. Remove an entry\n4. Cancel",
+        description="Select an action by typing the corresponding number:\n1. Add a new entry\n2. Update an existing entry\n3. Remove an entry\n4. View watchlist\n5. Cancel",
         color=discord.Color.blue()
     )
     await interaction.response.send_message(embed=embed, ephemeral=True)
@@ -120,6 +120,8 @@ async def watch_tracker(interaction: discord.Interaction):
         elif action == 3:
             await slash_commands.remove_record_prompt(interaction, bot)
         elif action == 4:
+            await slash_commands.view_watchlist(interaction, bot)
+        elif action == 5:
             await interaction.followup.send("Action cancelled.", ephemeral=True)
         else:
             await interaction.followup.send("Invalid action. Please choose a number from the list.", ephemeral=True)
