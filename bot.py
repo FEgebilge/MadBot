@@ -12,6 +12,7 @@ intents = discord.Intents.default()
 intents.message_content = True
 
 bot=commands.Bot(command_prefix="!", intents=intents)
+interaction_states = {}  # Dictionary to track interaction states for each user
 TOKEN = config.DISCORD_TOKEN
 
     
@@ -87,7 +88,45 @@ async def ping(interaction:discord.Interaction):
     await slash_commands.ping(host_site,interaction=interaction)
 
 
+@bot.tree.command(name="watch_tracker")
+async def watch_tracker(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
     
+    # Check if the user already has an ongoing interaction
+    if user_id in interaction_states and interaction_states[user_id] == 'ongoing':
+        await interaction.response.send_message("You already have an ongoing action. Please complete it before starting a new one.", ephemeral=True)
+        return
+    
+    interaction_states[user_id] = 'ongoing'  # Set state to ongoing
+    embed = discord.Embed(
+        title="Watch Tracker",
+        description="Select an action by typing the corresponding number:\n1. Add a new entry\n2. Update an existing entry\n3. Remove an entry\n4. Cancel",
+        color=discord.Color.blue()
+    )
+    await interaction.response.send_message(embed=embed, ephemeral=True)
+    
+    def check(msg):
+        return msg.author == interaction.user and msg.channel == interaction.channel and msg.content.isdigit()
+    
+    try:
+        msg = await bot.wait_for('message', check=check, timeout=60)  # Wait for user response with a timeout
+        await msg.delete()  # Delete the user's message to keep the chat clean
+        action = int(msg.content)
+        
+        if action == 1:
+            await slash_commands.add_record_prompt(interaction, bot)
+        elif action == 2:
+            await slash_commands.update_record_prompt(interaction, bot)
+        elif action == 3:
+            await slash_commands.remove_record_prompt(interaction, bot)
+        elif action == 4:
+            await interaction.followup.send("Action cancelled.", ephemeral=True)
+        else:
+            await interaction.followup.send("Invalid action. Please choose a number from the list.", ephemeral=True)
+    except asyncio.TimeoutError:
+        await interaction.followup.send("Action timed out. Please start again.", ephemeral=True)
+    
+    interaction_states[user_id] = 'completed'  # Reset state to completed
 """
 @bot.tree.command(name="gpt")
 @app_commands.describe(chat="Your message to chatGPT")

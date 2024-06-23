@@ -1,6 +1,7 @@
 
 .DS_Store
 config.json
+config/user_data/
 __pycache__/bot.cpython-312.pyc
 .vscode/settings.json
 __pycache__/youtube_player.cpython-311.pyc

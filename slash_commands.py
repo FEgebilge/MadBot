@@ -7,6 +7,7 @@ import lists
 import asyncio
 import time
 import http.client
+import watch_tracker
 from PIL import Image, ImageDraw, ImageFont
 
 
@@ -194,3 +195,125 @@ async def meme_generator(interaction: discord.Interaction, text: str,y_position:
 
     await interaction.response.send_message(file=image_file)
 
+
+async def add_record_prompt(interaction: discord.Interaction, bot: discord.Client):
+    await interaction.followup.send("Enter the name of the series/movie (or type 0 to cancel):", ephemeral=True)
+    msg = await bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
+    await msg.delete()
+    
+    if msg.content == "0":
+        await interaction.followup.send("Action cancelled.", ephemeral=True)
+        return
+    
+    name = msg.content
+    await interaction.followup.send("Enter the current position (or 'Finished') (or type 0 to cancel):", ephemeral=True)
+    msg = await bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
+    await msg.delete()
+    
+    if msg.content == "0":
+        await interaction.followup.send("Action cancelled.", ephemeral=True)
+        return
+    
+    position = msg.content
+    watch_tracker.add_record(str(interaction.user.id), name, position)
+    await interaction.followup.send(f"Record for '{name}' added successfully.", ephemeral=True)
+
+async def update_record_prompt(interaction: discord.Interaction, bot: discord.Client):
+    user_id = str(interaction.user.id)
+    data = watch_tracker.load_data(user_id)
+    if not data:
+        await interaction.followup.send("No records found.", ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        title="Update Record",
+        description="Select a record to update by typing the corresponding number or type 0 to cancel:",
+        color=discord.Color.green()
+    )
+    records = [f"{index + 1}. {name}: {position}" for index, (name, position) in enumerate(data.items())]
+    embed.add_field(name="Your records", value="\n".join(records), inline=False)
+    await interaction.followup.send(embed=embed, ephemeral=True)
+    
+    def check(msg):
+        return msg.author == interaction.user and msg.channel == interaction.channel and msg.content.isdigit()
+    
+    try:
+        msg = await bot.wait_for('message', check=check, timeout=60)
+        await msg.delete()
+        index = int(msg.content) - 1
+        
+        if index == -1:
+            await interaction.followup.send("Action cancelled.", ephemeral=True)
+            return
+        
+        if index < 0 or index >= len(data):
+            await interaction.followup.send("Invalid selection.", ephemeral=True)
+            return
+        
+        name = list(data.keys())[index]
+        await interaction.followup.send(f"Enter the new position for '{name}' (or 'Finished') (or type 0 to cancel):", ephemeral=True)
+        msg = await bot.wait_for('message', check=lambda m: m.author == interaction.user and m.channel == interaction.channel)
+        await msg.delete()
+        
+        if msg.content == "0":
+            await interaction.followup.send("Action cancelled.", ephemeral=True)
+            return
+        
+        position = msg.content
+        watch_tracker.update_record(user_id, name, position)
+        await interaction.followup.send(f"Record for '{name}' updated successfully.", ephemeral=True)
+    except asyncio.TimeoutError:
+        await interaction.followup.send("Action timed out. Please start again.", ephemeral=True)
+
+async def remove_record_prompt(interaction: discord.Interaction, bot: discord.Client):
+    user_id = str(interaction.user.id)
+    data = watch_tracker.load_data(user_id)
+    if not data:
+        await interaction.followup.send("No records found.", ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        title="Remove Record",
+        description="Select a record to remove by typing the corresponding number or type 0 to cancel:",
+        color=discord.Color.red()
+    )
+    records = [f"{index + 1}. {name}: {position}" for index, (name, position) in enumerate(data.items())]
+    embed.add_field(name="Your records", value="\n".join(records), inline=False)
+    await interaction.followup.send(embed=embed, ephemeral=True)
+    
+    def check(msg):
+        return msg.author == interaction.user and msg.channel == interaction.channel and msg.content.isdigit()
+    
+    try:
+        msg = await bot.wait_for('message', check=check, timeout=60)
+        await msg.delete()
+        index = int(msg.content) - 1
+        
+        if index == -1:
+            await interaction.followup.send("Action cancelled.", ephemeral=True)
+            return
+        
+        if index < 0 or index >= len(data):
+            await interaction.followup.send("Invalid selection.", ephemeral=True)
+            return
+        
+        name = list(data.keys())[index]
+        watch_tracker.delete_record(user_id, name)
+        await interaction.followup.send(f"Record for '{name}' removed successfully.", ephemeral=True)
+    except asyncio.TimeoutError:
+        await interaction.followup.send("Action timed out. Please start again.", ephemeral=True)
+
+async def list_records(interaction: discord.Interaction):
+    user_id = str(interaction.user.id)
+    data = watch_tracker.load_data(user_id)
+    if not data:
+        await interaction.response.send_message("No records found.", ephemeral=True)
+        return
+
+    embed = discord.Embed(
+        title="Your Records",
+        color=discord.Color.purple()
+    )
+    records = [f"{index + 1}. {name}: {position}" for index, (name, position) in enumerate(data.items())]
+    embed.add_field(name="Records", value="\n".join(records), inline=False)
+    await interaction.response.send_message(embed=embed, ephemeral=True)
